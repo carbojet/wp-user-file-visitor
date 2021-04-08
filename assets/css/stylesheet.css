@@ -1,0 +1,21 @@
+.wp-cj-register-container {
+    margin: 0 auto;
+    max-width: 450px;
+    position: relative;
+    overflow: hidden;
+    padding: 26px 24px 36px;
+    -webkit-box-shadow: 2px 2px 3px rgb(0 0 0 / 25%);
+    box-shadow: 2px 2px 3px rgb(0 0 0 / 25%);
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin-right: 0;
+}
+.wp-cj-register-container fieldset {
+    border-width: 0;
+    border-color: inherit;
+    padding: 0;
+    margin: 0;
+}
+.cleanlogin-container{
+    margin-left:0;
+}
