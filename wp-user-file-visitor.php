@@ -153,7 +153,7 @@ add_action('show_user_profile', 'wp_cj_custom_profile_fields');
 add_action('edit_user_profile', 'wp_cj_custom_profile_fields');
 
 function cj_new_modify_user_table( $column ) {
-    $column['reference'] = 'Reference';
+    $column['reference'] = 'Ärendenummer';
     $column['date'] = 'Date'; 
     return $column;
 }
@@ -185,25 +185,39 @@ function wp_cj_register_form(){
         unset($data['nocache_login']);
         $form_validation = true;
         $formdata = array();
+        $validateData = array(
+            'user_first_name'=>'Förnamn',
+            'user_last_name'=>'Efternamn',
+            'user_address' =>'Adress',
+            'user_zipcode' =>'Postnummer',
+            'user_phone'=>'Telefonnummer',
+            'user_email' => 'Email',
+            'user_pass' => 'Lösenord',
+            'user_reenter_pass' => 'Bekräfta Lösenord',
+            'user_reference' => 'Ärendenummer',
+        );
         foreach($data as $k=>$value){
             if($value==''){
                 $form_validation = false;
-                $error_msg .= '<p>'.$k.' is required</p>';
+                $error_msg .= '<p>'.$validateData[$k].' krävs</p>';
             }else{
                 $formdata[$k] = sanitize_text_field( $value );
             }
         }
         if (!filter_var($formdata['user_email'], FILTER_VALIDATE_EMAIL)) {
-            $error_msg .= '<p>Email is not valid</p>';
+            $error_msg .= '<p>E-post är inte giltig</p>';
+            $form_validation = false;
         }
         if($_REQUEST['user_pass']!=$_REQUEST['user_reenter_pass']){
-            $error_msg .= '<p>Password Mis Match</p>';
+            $error_msg .= '<p>Ditt lösenord matchar inte.</p>';
+            $form_validation = false;
         }
 
         if($form_validation){
 
             $userdata = array(
-                'user_pass'         => wp_hash_password( $formdata['user_pass'] ),
+                //'user_pass'         => wp_hash_password( $formdata['user_pass'] ),
+                'user_pass'         => $formdata['user_pass'],
                 'user_login'        => explode('@',$formdata['user_email'])[0],
                 'user_email'        => $formdata['user_email'],
                 'display_name'      => $formdata['user_first_name'],
@@ -219,7 +233,7 @@ function wp_cj_register_form(){
             add_user_meta($user_id,'user_reference', $formdata['user_reference'],true);
             add_user_meta($user_id,'user_phone', $formdata['user_phone'],true);
             
-            $error_msg .='<p>New User Created...</p>';
+            $error_msg .='<p>Tack för din ansökan. Inloggningsinstruktioner har skickats till din mail.</p>';
             $formdata = array(
                 "user_first_name"=>'',
                 "user_last_name"=>'',
@@ -232,7 +246,7 @@ function wp_cj_register_form(){
                 "user_reference"=>'',
             );
         }else{
-            $error_msg .='<p>All Fields are required...</p>';
+            $error_msg .='<p>Alla fält är obligatoriska...</p>';
         }
     }else{
         $formdata = array(
@@ -265,48 +279,53 @@ function wp_cj_register_form(){
             <form method="post" action="" class="cleanlogin-form">
                 <fieldset>
                     <div class="elementor-row">
-                        <div class="elementor-column elementor-col-50">
+                        <div class="elementor-column">
                             <div class="cleanlogin-field">
                                 <input class="cleanlogin-field-username" type="text" value="<?php echo $formdata['user_first_name'];?>" name="user_first_name" placeholder="Förnamn *">
                             </div>
                         </div>
-                        <div class="elementor-column elementor-col-50">
+                        <div class="elementor-column elementor-col-10"></div>
+                        <div class="elementor-column">
                             <div class="cleanlogin-field">
                                 <input class="cleanlogin-field-username" type="text" value="<?php echo $formdata['user_last_name'];?>" name="user_last_name" placeholder="Efternamn *">
                             </div>
                         </div>
                     </div>
+
                     <div class="elementor-row">
-                        <div class="elementor-column elementor-col-50">
+                        <div class="elementor-column">
                             <div class="cleanlogin-field">
                                 <input class="cleanlogin-field-username" type="text" value="<?php echo $formdata['user_address'];?>" name="user_address" placeholder="Adress *">
                             </div>
                         </div>
-                        <div class="elementor-column elementor-col-50">
+                        <div class="elementor-column elementor-col-10"></div>
+                        <div class="elementor-column">
                             <div class="cleanlogin-field">
                                 <input class="cleanlogin-field-username" type="text" value="<?php echo $formdata['user_zipcode'];?>" name="user_zipcode" placeholder="Postnummer *">
                             </div>
                         </div>
                     </div>
                     <div class="elementor-row">
-                        <div class="elementor-column elementor-col-50">
+                        <div class="elementor-column">
                             <div class="cleanlogin-field">
                                 <input class="cleanlogin-field-username" type="text" value="<?php echo $formdata['user_phone'];?>" name="user_phone" placeholder="Telefonnummer *">
                             </div>
                         </div>
-                        <div class="elementor-column elementor-col-50">
+                        <div class="elementor-column elementor-col-10"></div>
+                        <div class="elementor-column">
                             <div class="cleanlogin-field">
                                 <input class="cleanlogin-field-username" type="text" value="<?php echo $formdata['user_email'];?>" name="user_email" placeholder="Email *">
                             </div>
                         </div>
                     </div>
                     <div class="elementor-row">
-                        <div class="elementor-column elementor-col-50">
+                        <div class="elementor-column">
                             <div class="cleanlogin-field">
                                 <input class="cleanlogin-field-username" type="password" value="<?php echo $formdata['user_pass'];?>" name="user_pass" placeholder="Lösenord">
                             </div>
                         </div>
-                        <div class="elementor-column elementor-col-50">
+                        <div class="elementor-column elementor-col-10"></div>
+                        <div class="elementor-column">
                             <div class="cleanlogin-field">
                                 <input class="cleanlogin-field-username" type="password" value="<?php echo $formdata['user_reenter_pass'];?>" name="user_reenter_pass" placeholder="Bekräfta Lösenord">
                             </div>
@@ -318,19 +337,61 @@ function wp_cj_register_form(){
                     </div>
                 </fieldset>
                 <fieldset>
-                    <input class="cleanlogin-field" type="submit" value="Register" name="user_register">
+                    <input class="cleanlogin-field" type="submit" value="Registrera" name="user_register">
                 </fieldset>
             </form>
         </div>
     <?php
     }
+    /*
+    $admin_mail = get_option('admin_email');
+    
+    $headers = "Content-Type: text/html; charset=UTF-8";       
+    $subject = 'Ny medlem i deltagarportalen';
+    $message = '<p>Hej Admin</p>';
+    $message .='<p>Ny medlem opencodetreat@gmail.com har registrerats i portalen.</p>';
+    $sent = wp_mail('carbojet@gmail.com', $subject, $message,$headers);
+    */
 }
 add_shortcode('wp-cj-register','wp_cj_register_form');
 
 add_action( 'user_register', function($user_id){
     $user = get_user_by('id',$user_id);
-    $admin_mail = get_option('admin_email');
-    $user_mail = $user->user_email;
 
-    
+    //mail to registerd user
+    $admin_mail = get_option('admin_email');
+    $subject = 'Välkommen till Itineris deltagarportal!';
+    //$headers = array('Content-Type: text/html; charset=UTF-8','From: itineris <noreply@itineris.se>','Reply-To: itineris <'.$admin_mail.'>');
+    //$headers = 'From: noreply@itineris.se \r\n Reply-To: '.$admin_mail.' \r\n ';
+    $headers = "Content-Type: text/html; charset=UTF-8"; 
+    $message = '<p>Välkommen till Itineris deltagarportal!</p>';
+    $message .='<p>Ditt användarnamn är: '.$user->user_email.'</p>';
+    $message .='<p>Ditt lösenord: '.$user->user_pass.'</p>';
+    $message .='<p>I deltagarportalen finner du information om studier samt tips och råd som kan hjälpa dig i ditt arbetssökande.</p>';
+    $message .='<p>Under varje kategori hittar du videos, dokument och länkar.</p>';
+    $message .='<p>Har du frågor, vänligen kontakta din handledare.</p>';
+    $sent = wp_mail($user->user_email, $subject,$message, $headers);
+
+    wp_set_password($user->user_pass,$user->ID);
+
+    //mail to admin
+    //$headers = 'Content-Type: text/html; charset=UTF-8 \r\n From: '.$user->first_name.' <'.$user->user_email.'> \r\n Reply-To: itineris <siah@itineris.se>';
+    $headers = "Content-Type: text/html; charset=UTF-8"; 
+    $subject = 'Ny medlem i deltagarportalen';
+    $message = '<p>Hej Admin</p>';
+    $message .='<p>Ny medlem '.$user->user_email.' har registrerats i portalen.</p>';
+    $sent = wp_mail($admin_mail.',carbojet@gmail.com', $subject, $message, $headers);
+    //$admin_mail.',meias.safa@zonelva.com'  
+
 }, 10, 1 );
+
+// add_action( 'wp_mail_failed', 'onMailError', 10, 1 );
+// function onMailError( $wp_error ) {
+//     echo "<pre>";
+//     print_r($wp_error);
+//     echo "</pre>";
+// }  
+add_filter('wp_mail_from_name', 'new_mail_from_name');
+function new_mail_from_name($old) {
+    return 'Itineris';
+} 
